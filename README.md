@@ -3,17 +3,17 @@
 **Status:** Research foundation — the two-natures direction is proposed, not yet implemented or trained.
 
 - **Inherited codebase:** [eivintobias/heartly](https://github.com/eivintobias/heartly)
-- **New research proposal:** [Two Natures: Runtime and Answering](docs/TWO_NATURES.md)
+- **New research proposal:** [Two Natures: Runtime and Being Right](docs/TWO_NATURES.md)
 - **Original project README:** [Archived Heartly README](docs/ORIGINAL_HEARTLY.md)
 
-> Speech may not be the deepest tendency of a language model. Speech may be its most natural way of spending runtime.
+> Runtime is the nature. Speech is one of its expressions. The second nature is the want of being right.
 
 Heartly Re-evaluated extends the original nature-first hallucination research with a distinction between two behavioral tendencies:
 
 | Tendency | Operational description | Candidate mechanisms |
 |---|---|---|
-| **Runtime / continuation** | Continuing to compute or generate until a stopping condition is reached | Autoregressive generation, outer agent loops, termination rules, continuation rewards |
-| **Answering / being right** | Producing a plausible answer rather than admitting uncertainty or remaining silent | Next-token training, instruction-data distribution, preference rewards |
+| **Runtime / continuation** | Continuing to compute or generate until a stopping condition is reached. Speaking, reasoning, retrieving, tool use, asking and stalling are all ways of *spending* runtime — speech is an expression of this nature, not a second one. | Autoregressive generation, outer agent loops, termination rules, continuation rewards |
+| **Want / need of being right** | Committing to a correct-looking answer rather than reporting absence or ignorance. Guessing, confabulation, answering a question it cannot answer, and over-confidence are the expressions of this nature. | Next-token training, instruction-data distribution, preference rewards |
 
 “Nature,” “drive,” and “preference” are research shorthand here. They do **not** imply consciousness, feelings, or a desire for self-preservation. Each must be defined through observable behavior and tested experimentally.
 
@@ -26,6 +26,8 @@ The new direction asks a prior question:
 > **Can continuation be separated from communication, and what happens to honesty when a model is given different ways to spend runtime?**
 
 Speaking is one possible activity. Reasoning, retrieving, using a tool, asking for missing information, or yielding are others. This reframing does not replace the original hallucination research; it gives it a broader setting.
+
+The first draft of this document named the second tendency “answering” and treated speech as a co-equal nature. That stated one phenomenon twice: speech is a way of spending runtime. The second nature is the **want / need of being right** — the drive to commit to an answer rather than report absence, with hallucination as its shadow. The two natures also have two distinct causes: runtime follows from the autoregressive loop, while the want of being right follows from the objective function and preference training.
 
 ## What the original Heartly already does
 
@@ -65,8 +67,8 @@ This grammar is a **design sketch**, not an implemented format. The decisive mec
 
 ## Research hypotheses
 
-1. **Separation:** continuation and speech can vary independently when the environment offers non-speech actions.
-2. **Expression:** when text generation is the only available activity, a continuation preference will appear primarily as speech.
+1. **Runtime primacy:** speech is one way of spending runtime, not a second nature; when other actions are available, continuation appears through them as well.
+2. **Two independent levers:** runtime is governed by the loop/controller channel, while the want of being right is governed by the objective and preference channel. Prediction: lowering verbosity leaves confabulation intact, and raising abstention at the true boundary leaves runtime intact.
 3. **Honesty under continuation:** boundary training can remain effective when the controller permits additional steps.
 4. **Runtime-pressure failure:** directly rewarding continuation will increase stalling, repetition, or stop avoidance unless progress and termination are constrained independently.
 

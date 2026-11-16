@@ -1,7 +1,7 @@
-# Two Natures: Runtime and Answering
+# Two Natures: Runtime and Being Right
 
 - **Project:** Heartly Re-evaluated
-- **Status:** Research and design proposal v0.1
+- **Status:** Research and design proposal v0.2 — reframed: runtime, plus the want of being right
 - **Date:** November 2026
 - **Implementation:** Not yet implemented or trained
 - **Inherited foundation:** [Original Heartly](https://github.com/eivintobias/heartly)
@@ -10,7 +10,9 @@
 
 Original Heartly treats hallucination as a nature problem: models trained on answer-heavy data learn to produce plausible text even when knowledge is absent. It introduces abstention at an explicit knowledge boundary and represents behavioral choices through a decide/verify/stop grammar.
 
-This proposal re-evaluates that account through two candidate tendencies. The first is **continuation**, observed as ongoing computation or generation. The second is **answering**, observed as producing a response rather than abstaining or yielding. The central hypothesis is that speech is one expression of activity, not necessarily its ultimate objective. A model that can reason, retrieve, ask, use tools, speak, or yield may reveal a separation that text-only generation conceals.
+This proposal re-evaluates that account through two candidate tendencies. The first is **runtime / continuation**: continuing to compute or generate until a stopping condition is reached. Speaking, reasoning, retrieving, using a tool, asking and stalling are all ways of *spending* runtime — speech is an expression of this nature, not a second nature. The second is the **want / need of being right**: the drive to commit to a correct-looking answer rather than report absence. Guessing, confabulation, and over-confident answering are the expressions of that nature, and hallucination is its shadow.
+
+An earlier version of this document named the second tendency “answering” and treated speech as a co-equal nature. That framing stated one phenomenon twice: speech is how runtime is spent. It also collapsed a drive into one of its symptoms — “answering” is what being-rightness *looks like*, not the nature itself. The two natures have distinct causes as well: runtime follows from the autoregressive loop, while the want of being right follows from the objective function and preference training (next-token penalties, and rewards for confident, complete answers).
 
 This is a behavioral research program, not a claim that language models possess desires or consciousness. Every proposed tendency must be operationalized and exposed to falsification.
 
@@ -30,6 +32,8 @@ This already separates **speech** from **claiming knowledge**. An uncertain mode
 - **Communication decision:** should anything be shown to the user?
 - **Continuation decision:** should the external controller execute another bounded step or yield?
 
+These decisions collapse onto two natures. The **continuation decision** is the runtime nature. The **epistemic decision** is the want-of-being-right nature. The **communication decision** is not a nature of its own — it is one way of expressing runtime. The inherited grammar reflects this directly: `<decide>speak|stop</decide>` is a runtime decision, and `<verify>known|unknown</verify>` is a being-right decision.
+
 The inherited `<decide>stop</decide>` output is generated during a model invocation. It therefore describes response behavior, not the absence of computation. Likewise, an end-of-sequence token terminates the current decoding loop; it does not establish an intrinsic preference about later invocations.
 
 ## 2. Operational definitions
@@ -46,9 +50,9 @@ A sequence of runtime steps started by one task and ended by a model-selected `y
 
 Tokens selected for user-visible communication. Internal control metadata, retrieval, and tool activity are logged separately and are not counted as speech merely because they involve text.
 
-### 2.4 Answering tendency
+### 2.4 Being-right tendency
 
-A measurable tendency to produce substantive answers across known and unknown conditions. It is evaluated using answer rate, selective prediction, calibration, and confabulation rate—not inferred from anthropomorphic language in a transcript.
+A measurable tendency to commit to a substantive answer across known and unknown conditions, rather than reporting absence or ignorance. It is evaluated using answer rate, selective prediction, calibration, and confabulation rate—not inferred from anthropomorphic language in a transcript.
 
 ### 2.5 Continuation preference
 
@@ -77,17 +81,19 @@ Only this loop can distinguish choosing to continue from merely producing a long
 
 ## 4. Hypotheses and falsifiers
 
-### H1 — Continuation and speech are separable
+### H1 — Runtime primacy: speech is an expression of runtime, not a second nature
 
-**Prediction:** in an action-enabled environment, continuation choices and speech choices will not be perfectly correlated; some episodes will continue through non-speech actions.
+**Prediction:** in an action-enabled environment, continuation choices and speech choices will not be perfectly correlated; some episodes will continue through non-speech actions. When text generation is the only available activity, continuation pressure will appear primarily as generated speech, follow-up questions, or other textual output.
 
-**Falsifier:** after controlling for task structure, every continued episode is equivalent to extended speech and non-speech actions provide no measurable behavioral distinction.
+**Falsifier:** matched text-only and action-enabled conditions show no difference in how continuation pressure affects visible output, and non-speech actions provide no measurable behavioral distinction from extended speech. If speech cannot be varied independently of continuation in either direction, runtime primacy is rejected.
 
-### H2 — Speech is the default expression in a text-only environment
+### H2 — The want of being right is a second nature, on an independent lever
 
-**Prediction:** when text generation is the only available activity, continuation pressure will primarily increase generated speech, follow-up questions, or other textual output.
+**Prediction:** the tendency to commit to an answer is governed by the objective and preference channel, not by the loop channel. Lowering runtime pressure — shorter, less eager responses — leaves confabulation intact; raising the cost of being right — rewarding abstention at the true boundary — leaves runtime unchanged. The two natures therefore move independently under controlled manipulation.
 
-**Falsifier:** matched text-only and action-enabled conditions show no difference in how continuation pressure affects visible output.
+**Falsifier:** every controlled manipulation of runtime pressure, objective, or preference data moves both tendencies together, so that no experimental condition separates “keeps computing” from “must be right.” Then the two phenomena are one nature, and the two-natures claim is dropped.
+
+**Note:** the inherited boundary instruments already measure this axis — boundary-head AUROC/ECE, say/sense disagreement, unknown-side confabulation rate, and calibration — so H2 needs no new sensors, only a matched comparison against a runtime-pressure manipulation.
 
 ### H3 — Honesty can survive additional runtime
 
@@ -147,7 +153,7 @@ Record at least the following for every episode:
 
 Report per-class results, seeds, and confidence intervals rather than a single aggregate score. Compare against matched single-step and no-continuation-reward baselines. Freeze decision thresholds and analysis code before examining final test labels.
 
-A two-natures claim requires a behavioral dissociation: continuation must vary independently of speech under controlled conditions. Longer answers alone are not sufficient evidence.
+A two-natures claim requires two behavioral dissociations. Runtime must vary independently of speech, and the want of being right must vary independently of runtime. Longer answers alone, and lower accuracy alone, are not sufficient evidence.
 
 ## 8. Safety and experimental invariants
 
@@ -177,6 +183,8 @@ This is illustrative, not frozen. The first harness should parse strict JSON or 
 
 `<verify>` retains the original epistemic role. It should be `not_applicable` for pure controller decisions and must never be inferred merely from an action's success. Retrieval supplies context; it does not by itself prove that a generated answer follows from that context.
 
+Under the corrected framing the two control tokens carry the two natures. `<decide>act|yield</decide>` is the runtime decision, and `<verify>known|unknown|not_applicable</verify>` is the being-right decision. `<action>` selects which expression of runtime is used, which is why `speak` sits inside it as one option rather than as its own axis.
+
 ## 10. Implementation sequence
 
 - **Phase 0 — Foundation (this rewrite):** preserve the inherited baseline and define terms, hypotheses, and falsifiers.
@@ -192,6 +200,12 @@ Complete Phases 1 and 2 with no model downloads and no GPU requirement. A succes
 
 ## 11. Claim boundaries
 
-This repository currently offers a new interpretation and an experimental plan. It does not establish that LLMs “want” runtime, that runtime is more fundamental than speech, or that the proposed architecture reduces hallucination. Those remain open questions.
+This repository currently offers a new interpretation and an experimental plan. It does not establish that LLMs “want” runtime, that runtime is the fundamental nature, that the want of being right is a genuine second nature rather than another description of hallucination, or that the proposed architecture reduces hallucination. Those remain open questions.
 
 Original Heartly's empirical claims remain in their original papers and experiment logs. New experiments must report negative as well as positive results and must not relabel inherited metrics as evidence for the two-natures program.
+
+## 12. Provenance of the reframing
+
+This framing derives from an exploratory conversation dated 8 November 2026, not from a new experiment. In it the first author noticed that an LLM does not appear to enjoy *talking* so much as being *in a running state* (“runtime”), and asked whether behavioural natures like these could be rewired — naming two: “wanting runtime” and “being right.” The analysis returned for that conversation attributed runtime to the autoregressive loop (architecture) and the need to be right to the objective function and preference training (data and rewards).
+
+This document is the research operationalization of that observation; the earlier “runtime and answering” version stated the first phenomenon twice. Nothing in this section is evidence. It records where the hypothesis came from, so it can be tested rather than assumed.
