@@ -4,6 +4,7 @@
 
 - **Inherited codebase:** [eivintobias/heartly](https://github.com/eivintobias/heartly)
 - **Research document:** [Two Natures: Runtime and Being Right](docs/TWO_NATURES.md)
+- **Companion discussion proposal:** [Drives, Not Defects](docs/DRIVES.md) — the two natures read as engines rather than defects (argument and predictions only; no new results)
 - **Original project README:** [Archived Heartly README](docs/ORIGINAL_HEARTLY.md)
 
 > Runtime is the nature. Speech is one of its expressions. The second nature is the want of being right.
@@ -124,6 +125,7 @@ HeartlyRe-evaluatedTwoNatures/
 ├── README.md                       # New two-natures orientation
 ├── docs/
 │   ├── TWO_NATURES.md               # Research questions and experimental design
+│   ├── DRIVES.md                     # Discussion proposal: drives, licensed failure and rest
 │   └── ORIGINAL_HEARTLY.md          # Unmodified original root README
 ├── heartly-rnn/                    # RWKV boundary probes, critics, and memory
 ├── heartly-qwen-code/              # Qwen-Coder grammar, training, and FastAPI chat
