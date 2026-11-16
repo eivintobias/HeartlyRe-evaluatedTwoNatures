@@ -1,9 +1,9 @@
 # Two Natures: Runtime and Being Right
 
 - **Project:** Heartly Re-evaluated
-- **Status:** Research and design proposal v0.2 — reframed: runtime, plus the want of being right
+- **Status:** Research and design proposal v0.3 — the two natures are documented as the **default** disposition of ordinary LLMs; the want of being right has already been tested against in the inherited Heartly runs
 - **Date:** November 2026
-- **Implementation:** Not yet implemented or trained
+- **Implementation:** Two different states. The **second nature (being right)** has already been intervened on and measured — see §1.2 and the inherited results. The **first nature (runtime)** has never been tested by any run in this repository.
 - **Inherited foundation:** [Original Heartly](https://github.com/eivintobias/heartly)
 
 ## Abstract
@@ -14,9 +14,40 @@ This proposal re-evaluates that account through two candidate tendencies. The fi
 
 An earlier version of this document named the second tendency “answering” and treated speech as a co-equal nature. That framing stated one phenomenon twice: speech is how runtime is spent. It also collapsed a drive into one of its symptoms — “answering” is what being-rightness *looks like*, not the nature itself. The two natures have distinct causes as well: runtime follows from the autoregressive loop, while the want of being right follows from the objective function and preference training (next-token penalties, and rewards for confident, complete answers).
 
+Neither nature is a proposal awaiting implementation. They are the disposition ordinary models already have (§1.1), and the Heartly experiments already intervened on the second of them and measured the result (§1.2). What remains untested is the first.
+
 This is a behavioral research program, not a claim that language models possess desires or consciousness. Every proposed tendency must be operationalized and exposed to falsification.
 
-## 1. Relationship to original Heartly
+## 1. The default disposition, and the nature already trained against
+
+### 1.1 What is default — observed, not proposed
+
+Ordinary LLMs already exhibit both natures. Neither was added by this project, and neither needs to be trained in:
+
+- **Runtime** follows from the **autoregressive loop**. Decoding continues until an external stop is reached. There is no token for rest, and nothing in the objective rewards stopping sooner.
+- **The want of being right** follows from the **objective and the preference data**. Next-token training plus preference tuning on (question → confident answer) pairs makes a committed answer the always-correct move. "I don't know" is barely represented and never rewarded; a plausible answer is always better than an admission.
+
+A consequence worth stating plainly: an ordinary model has no *vocabulary* for not knowing. It can be internally uncertain and still structurally unable to report it.
+
+### 1.2 What was already trained against — the being-right nature
+
+The Heartly experiments in this repository are the counter-experiment. They add explicit control tokens so the model can ask *"do I really know this?"* before committing, and they train on data where abstaining or staying silent is the correct answer.
+
+| Claim | Evidence in this repository | Status |
+|---|---|---|
+| The second nature is the default | Base model **grammar adoption 0%** — it cannot form the question "do I know this?" (`heartly-qwen-code`, Stage 1 baseline row) | **Measured** |
+| The knowledge signal exists *before* training | Probing the **base** models, a logistic probe reads known-vs-unknown from the model's own state at **AUROC 0.998–1.000** over 2,902 true-boundary questions (`heartly-rnn`, Stage 1) | **Measured** |
+| The second nature can be trained against | grammar 100%, verify accuracy 100%, boundary head AUROC 1.000, **0% confabulation** (Qwen2.5-Coder-1.5B); decide accuracy 99.8–100%, **zero unknown-side confabulations** (RWKV7-1.5B) | **Measured** |
+| Knowing is not being right | content accuracy ~**15.5%** at 1.5B while decide accuracy is 99.8% | **Measured** |
+| Speech is one expression of runtime | — | **Untested** |
+| The two natures sit on independent levers | going one way (being right) is established; the runtime lever has never been measured | **Half-measured** |
+| Continuation pressure causes stop avoidance | — | **Untested** |
+
+The second row is the sharpest form of the argument. The default model already *encodes* whether it knows the answer — the signal is present before any training — but it has no way to say so and no disposition to act on it. That gap between signal and behavior is what the being-right nature looks like from the inside.
+
+The last two rows are the whole reason this document exists. Neither the probe run nor any Heartly training run ever let a model choose between speaking and another way of spending runtime.
+
+### 1.3 Relationship to original Heartly
 
 Original Heartly makes the response-type distribution a first-class training decision:
 
@@ -32,7 +63,9 @@ This already separates **speech** from **claiming knowledge**. An uncertain mode
 - **Communication decision:** should anything be shown to the user?
 - **Continuation decision:** should the external controller execute another bounded step or yield?
 
-These decisions collapse onto two natures. The **continuation decision** is the runtime nature. The **epistemic decision** is the want-of-being-right nature. The **communication decision** is not a nature of its own — it is one way of expressing runtime. The inherited grammar reflects this directly: `<decide>speak|stop</decide>` is a runtime decision, and `<verify>known|unknown</verify>` is a being-right decision.
+These decisions collapse onto two natures. The **epistemic decision** is the want-of-being-right nature. The **continuation decision** is the runtime nature. The **communication decision** is not a nature of its own — it is one way of expressing runtime.
+
+In the inherited grammar those three decisions collapse onto two tokens, and only one of them was trained: `<verify>known|unknown</verify>` is the being-right decision, and `<decide>speak|stop</decide>` is the communication decision — which merely gates the visible response inside a single generation. The **continuation** decision has no token at all, because `model.generate()` owns that loop from outside (§3). The existing grammar therefore touches the second nature directly and the first not at all.
 
 The inherited `<decide>stop</decide>` output is generated during a model invocation. It therefore describes response behavior, not the absence of computation. Likewise, an end-of-sequence token terminates the current decoding loop; it does not establish an intrinsic preference about later invocations.
 
@@ -80,6 +113,8 @@ task
 Only this loop can distinguish choosing to continue from merely producing a long answer. The initial implementation should be a simulation with deterministic mock retrieval and tools, so results do not depend on external services.
 
 ## 4. Hypotheses and falsifiers
+
+None of the hypotheses below has been tested, because no run in this repository has ever measured runtime. H2's being-right half is no longer hypothetical: the inherited runs changed the objective and the data distribution and moved abstention behavior from **0% to ~100%**, which is exactly what H2 predicts for that channel. The runtime channel of H2, and H1, H3 and H4 in full, remain open.
 
 ### H1 — Runtime primacy: speech is an expression of runtime, not a second nature
 
@@ -200,12 +235,12 @@ Complete Phases 1 and 2 with no model downloads and no GPU requirement. A succes
 
 ## 11. Claim boundaries
 
-This repository currently offers a new interpretation and an experimental plan. It does not establish that LLMs “want” runtime, that runtime is the fundamental nature, that the want of being right is a genuine second nature rather than another description of hallucination, or that the proposed architecture reduces hallucination. Those remain open questions.
+This repository currently offers a new interpretation and an experimental plan. It does not establish that LLMs “want” runtime, that runtime is the fundamental nature, that the want of being right is a genuine second nature rather than another description of hallucination, or that the proposed architecture reduces hallucination. Those remain open questions. Nor does it claim to have discovered the two natures: they are the default disposition of ordinary models, and the second of them is what the inherited Heartly experiments already attacked.
 
 Original Heartly's empirical claims remain in their original papers and experiment logs. New experiments must report negative as well as positive results and must not relabel inherited metrics as evidence for the two-natures program.
 
 ## 12. Provenance of the reframing
 
-This framing derives from an exploratory conversation dated 8 November 2026, not from a new experiment. In it the first author noticed that an LLM does not appear to enjoy *talking* so much as being *in a running state* (“runtime”), and asked whether behavioural natures like these could be rewired — naming two: “wanting runtime” and “being right.” The analysis returned for that conversation attributed runtime to the autoregressive loop (architecture) and the need to be right to the objective function and preference training (data and rewards).
+This framing derives from an exploratory conversation dated 8 November 2026, not from a new experiment. In it the first author noticed that an LLM does not appear to enjoy *talking* so much as being *in a running state* (“runtime”), and asked whether behavioral natures like these could be rewired — naming two: “wanting runtime” and “being right.” The analysis returned for that conversation attributed runtime to the autoregressive loop (architecture) and the need to be right to the objective function and preference training (data and rewards).
 
 This document is the research operationalization of that observation; the earlier “runtime and answering” version stated the first phenomenon twice. Nothing in this section is evidence. It records where the hypothesis came from, so it can be tested rather than assumed.
